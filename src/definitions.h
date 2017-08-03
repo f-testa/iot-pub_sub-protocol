@@ -35,7 +35,7 @@ typedef nx_struct {
 
     nx_bool qos;
     nx_uint8_t topic_id;
-    nx_uint16_t data;
+    nx_uint8_t data;
     
 } pub_payload_t;
 

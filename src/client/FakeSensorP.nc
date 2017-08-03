@@ -5,7 +5,7 @@
  
 generic module FakeSensorP() {
 
-	provides interface Read<uint16_t>;
+	provides interface Read<uint8_t>;
 	
 	uses interface Random;
 	uses interface Timer<TMilli> as Timer0;

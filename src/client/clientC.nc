@@ -18,7 +18,7 @@ module clientC {
         interface Receive;
         interface Timer<TMilli> as ConnTimer;
         interface Timer<TMilli> as SampleTimer;
-        interface Read<uint16_t>;
+        interface Read<uint8_t>;
     }
 
 } implementation {
@@ -185,7 +185,7 @@ module clientC {
     }
   
     //************************* Read interface **********************//
-    event void Read.readDone(error_t result, uint16_t data) {
+    event void Read.readDone(error_t result, uint8_t data) {
 
         msg_t* mess=(msg_t*)(call Packet.getPayload(&packet,sizeof(msg_t)));
         mess->msg_type = PUB;

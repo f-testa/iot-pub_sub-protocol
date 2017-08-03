@@ -88,7 +88,7 @@ module brokerC {
        
         printf("[Broker] Try to send back CONNACK to node %d\n", node_id);
         if(call AMSend.send(node_id,&packet,sizeof(msg_t)) == SUCCESS){
-            printf("[Broker] CONNACK sent back to node %d\n", node_id);
+            printf("[Broker] CONNACK msg passed to lower level %d\n", node_id);
         }
     }
     
@@ -140,15 +140,15 @@ module brokerC {
     event void AMSend.sendDone(message_t* buf,error_t err) {
 
         if(&packet == buf && err == SUCCESS ) {
-            dbg("radio_send", "Packet sent...");
-
-            if ( call PacketAcknowledgements.wasAcked( buf ) ) {
+            printf("[Broker] msg sent\n");
+            
+            /*if ( call PacketAcknowledgements.wasAcked( buf ) ) {
                 dbg_clear("radio_ack", "and ack received");
                 //call MilliTimer.stop();
             } else {
                 dbg_clear("radio_ack", "but ack was not received");
                 //post sendReq();
-            }
+            }*/
         }
     }
 

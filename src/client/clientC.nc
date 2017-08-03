@@ -40,8 +40,9 @@ module clientC {
         mess -> msg_type = CONN;
         mess -> node_id = TOS_NODE_ID;
         
+         printf("[Client %d] Try to send CONN to Broker\n", TOS_NODE_ID);
         if(call AMSend.send(BROKER_ADDRESS,&packet,sizeof(msg_t)) == SUCCESS){
-            printf("[Client %d] CONN sent\n",TOS_NODE_ID);
+            printf("[Client %d] CONN msg passed to lower level\n",TOS_NODE_ID);
         }
     } 
     
@@ -78,7 +79,6 @@ module clientC {
         if(err == SUCCESS) {
             printf("[Client %d] Radio on\n", TOS_NODE_ID);
             if ( TOS_NODE_ID > 1 ) {
-                printf("[Client %d] Try to send CONN\n", TOS_NODE_ID);
                 // TODO decide qos+topic
                 call ConnTimer.startPeriodic( CONN_RETRY );
                 post sendConn();
@@ -103,10 +103,13 @@ module clientC {
     * subscription management.
     */
     event void ConnTimer.fired() {
-        if(!is_connected)
+        if(!is_connected){
+            printf("[Client %d] CONN Timeout\n", TOS_NODE_ID);
             post sendConn();
-        else   
-            post sendSub();
+        } else { 
+            printf("[Client %d] SUB Timeout\n", TOS_NODE_ID);
+            post sendSub();             
+        }
     }
     
     //***************** SampleTimer interface ********************//
@@ -119,15 +122,15 @@ module clientC {
     event void AMSend.sendDone(message_t* buf,error_t err) {
 
         if(&packet == buf && err == SUCCESS ) {
-            dbg("radio_send", "Packet sent...");
+            printf("[Client %d] msg sent\n", TOS_NODE_ID);
 
-            if ( call PacketAcknowledgements.wasAcked( buf ) ) {
+            /*if ( call PacketAcknowledgements.wasAcked( buf ) ) {
               dbg_clear("radio_ack", "and ack received");
               //call MilliTimer.stop();
             } else {
               dbg_clear("radio_ack", "but ack was not received");
               //post sendReq();
-            }  
+            }*/  
         }
     }
 

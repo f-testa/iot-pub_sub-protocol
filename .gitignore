@@ -1,0 +1,10 @@
+/src/broker/build/telosb/app.c
+/src/broker/build/telosb/ident_flags.txt
+/src/broker/build/telosb/main.exe
+/src/broker/build/telosb/main.ihex
+/src/broker/build/telosb/tos_image.xml
+/src/client/build/telosb/app.c
+/src/client/build/telosb/ident_flags.txt
+/src/client/build/telosb/main.exe
+/src/client/build/telosb/main.ihex
+/src/client/build/telosb/tos_image.xml

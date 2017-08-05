@@ -18,7 +18,7 @@ module brokerC {
         interface Receive;
         interface Timer<TMilli> as MilliTimer;
         interface BitVector as connected_nodes;
-        // TODO qos data structure
+        // topic qos
         // TODO pkt queue
     }
 
@@ -29,11 +29,10 @@ module brokerC {
 
     //*** Tasks declaration ***//
     task void sendReq();
-    task void sendResp();
     
     //*** Function declaration ***//
     void manageConn(uint8_t node_id);
-    void manageSub(sub_payload_t sub_pl);
+    void manageSub(uint8_t node_id, sub_payload_t sub_pl);
     
     
     //***************** Task send request ********************//
@@ -62,19 +61,14 @@ module brokerC {
 
         }*/
 
-    }        
-
-    //****************** Task send response *****************//
-    task void sendResp() {
-        //call Read.read();
     }
     
     /**
     * TODO
     */
     void manageConn(uint8_t node_id){
-        msg_t* mess = (msg_t*)(call Packet.getPayload(&packet,sizeof(msg_t)));
-        mess -> msg_type = CONNACK;
+        msg_t* msg = (msg_t*)(call Packet.getPayload(&packet,sizeof(msg_t)));
+        msg -> msg_type = CONNACK;
         
         //check on max number of clients
         if(node_id > MAX_NODES+1){
@@ -82,6 +76,7 @@ module brokerC {
             return;
         }
         
+        //set node_id as active and connected
         call connected_nodes.set(node_id-NODE_OFFSET);
         
         printf("[Broker] Received CONN from node %d\n", node_id);
@@ -95,12 +90,20 @@ module brokerC {
     /**
     TODO
     */
-    void manageSub(sub_payload_t sub_payload){
-        //msg_t* mess = (msg_t*)(call Packet.getPayload(&packet,sizeof(msg_t)));
-        int i;
+    void manageSub(uint8_t node_id, sub_payload_t sub_payload){
+        uint8_t i;
+        msg_t* msg = (msg_t*)(call Packet.getPayload(&packet,sizeof(msg_t)));
+        msg -> msg_type = SUBACK;
         
         for(i=0; i<TOPIC_COUNT; i++){
             // TODO
+        }
+        
+        printf("[Broker] Received SUB from node %d\n", node_id);
+       
+        printf("[Broker] Try to send back SUBACK to node %d\n", node_id);
+        if(call AMSend.send(node_id,&packet,sizeof(msg_t)) == SUCCESS){
+            printf("[Broker] SUBACK msg passed to lower level\n");
         }
         
     }
@@ -157,25 +160,16 @@ module brokerC {
 
         msg_t* mess = (msg_t*)payload;
 
-        //printf("Message received at time %s \n", sim_time_string());
-        /*printf(">>>Pack \n \t Payload length %hhu \n", call Packet.payloadLength( buf ) );
-        printf("\t Source: %d \n", call AMPacket.source( buf ) );
-        printf("\t Destination: %d \n", call AMPacket.destination( buf ) );
-        printf("\t AM Type: %hhu \n", call AMPacket.type( buf ) );
-        printf("\t\t Payload \n" );
-        printf("\t\t msg_type: %hhu \n", mess->msg_type);
-        printf("\t\t node_id: %d \n", mess->node_id);
-        printf("\t\t value: %hhu \n", mess->value);*/
-
         // React accordingly to the received message type
         switch(mess->msg_type){
         
             case CONN:
+                //printf("%d\n",mess->node_id);
                 manageConn(mess->node_id);
                 break;
                 
             case SUB:
-                //manageSub(mess->msg_payload.sub_payload);
+                manageSub(mess->node_id, mess->msg_payload.sub_payload);
                 break;
                 
             case PUB:
@@ -187,11 +181,9 @@ module brokerC {
                 break;
                 
             default:
-                //TODO
+                printf("[Broker] ERROR: received message with a wrong type identifier\n");
         };
-
         return buf;
-
     }
     
 }

@@ -17,6 +17,8 @@
 
 #define NODE_OFFSET     2
 
+#define TOPIC_NAME_LENGTH 4
+
 /** MESSAGE STRUCTURE AND TYPES **/
 typedef enum {
     CONN, CONNACK,
@@ -57,7 +59,7 @@ typedef enum {
     HUMIDITY    = 2,
 } topic_t;
 
-char topic_name[TOPIC_COUNT][20]={"TEMPERATURE", "LUMINOSITY", "HUMIDITY"};
+char topic_name[TOPIC_COUNT][TOPIC_NAME_LENGTH+1]={"TEMP\0", "LUMI\0", "HUMI\0"};
 
 enum{
     AM_MY_MSG = 6,

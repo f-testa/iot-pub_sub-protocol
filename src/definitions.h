@@ -11,9 +11,9 @@
 #define BROKER_ADDRESS  1
 #define TOPIC_COUNT     3
 
-#define CONN_RETRY      1000
-#define SUB_RETRY       1000
-#define SAMPLE_DELAY    1000
+#define CONN_RETRY      2000
+#define SUB_RETRY       2000
+#define SAMPLE_DELAY    2000
 
 #define NODE_OFFSET     2
 

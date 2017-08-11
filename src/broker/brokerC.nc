@@ -25,18 +25,45 @@ module brokerC {
 } implementation {
 
     //*** Variables declaration ***//
-    message_t packet; 
+    message_t packet;
+    bool topic_sub [MAX_NODES][TOPIC_COUNT]; 
+    bool qos_sub [MAX_NODES][TOPIC_COUNT]; 
 
     //*** Tasks declaration ***//
-    task void sendReq();
+    //task void sendReq();
     
     //*** Function declaration ***//
     void manageConn(uint8_t node_id);
     void manageSub(uint8_t node_id, sub_payload_t sub_pl);
     
+    // TODO
+    void printSub(){
+        uint8_t i=0,j;
+        printf("-----------------------------------------\n");
+        printf("|  Node ID    | ");
+        for(i=0; i<MAX_NODES; i++){
+                printf("%d  ", i+2);
+        }
+        printf("|\n");
+        printf("-----------------------------------------\n");
+        for(j=0; j<TOPIC_COUNT; j++){   
+            printf("|  Topic %s | ", topic_name[j]);
+            for(i=0; i<MAX_NODES; i++){
+                printf("%d  ", topic_sub[i][j]);
+            }
+            printf("|\n");
+            printf("|  QoS        | ");
+            for(i=0; i<MAX_NODES; i++){
+                printf("%d  ", qos_sub[i][j]);
+            }
+            printf("|\n");
+            printf("-----------------------------------------\n");
+        }
+    }
+    
     
     //***************** Task send request ********************//
-    task void sendReq() {
+    //task void sendReq() {
 
         /*msg_t* mess=(msg_t*)(call Packet.getPayload(&packet,sizeof(msg_t)));
         mess->msg_type = REQ;
@@ -61,7 +88,7 @@ module brokerC {
 
         }*/
 
-    }
+    //}
     
     /**
     * TODO
@@ -95,17 +122,22 @@ module brokerC {
         msg_t* msg = (msg_t*)(call Packet.getPayload(&packet,sizeof(msg_t)));
         msg -> msg_type = SUBACK;
         
+        printf("[Broker] Received SUB from node %d\n", node_id);            
         for(i=0; i<TOPIC_COUNT; i++){
-            // TODO
+            topic_sub[node_id-NODE_OFFSET][i] = sub_payload.topic[i];
+            if(sub_payload.topic[i])
+                qos_sub[node_id-NODE_OFFSET][i] = sub_payload.qos[i];
         }
+    
+        printSub();
         
-        printf("[Broker] Received SUB from node %d\n", node_id);
-       
         printf("[Broker] Try to send back SUBACK to node %d\n", node_id);
-        if(call AMSend.send(node_id,&packet,sizeof(msg_t)) == SUCCESS){
+        i = call AMSend.send(node_id,&packet,sizeof(msg_t));
+        if(i == SUCCESS){
             printf("[Broker] SUBACK msg passed to lower level\n");
         }
-        
+        else
+            printf("[Broker] *** ERROR, SUBACK msg not passed to lower level (error code: %d) ***\n", i);       
     }
 
     //***************** Boot interface ********************//

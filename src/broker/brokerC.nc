@@ -94,8 +94,11 @@ module brokerC {
     * TODO
     */
     void manageConn(uint8_t node_id){
+        uint8_t err_code;
         msg_t* msg = (msg_t*)(call Packet.getPayload(&packet,sizeof(msg_t)));
         msg -> msg_type = CONNACK;
+
+        printf("[Broker] Received CONN from node %d\n", node_id);
         
         //check on max number of clients
         if(node_id > MAX_NODES+1){
@@ -104,14 +107,17 @@ module brokerC {
         }
         
         //set node_id as active and connected
-        call connected_nodes.set(node_id-NODE_OFFSET);
+        if(!(call connected_nodes.get(node_id-NODE_OFFSET)))
+            call connected_nodes.set(node_id-NODE_OFFSET);
+        else 
+            printf("[Broker] *** ERROR: CONN already received from %d ***\n", node_id);
         
-        printf("[Broker] Received CONN from node %d\n", node_id);
-       
         printf("[Broker] Try to send back CONNACK to node %d\n", node_id);
-        if(call AMSend.send(node_id,&packet,sizeof(msg_t)) == SUCCESS){
+        err_code = call AMSend.send(node_id,&packet,sizeof(msg_t));
+        if(err_code == SUCCESS){
             printf("[Broker] CONNACK msg passed to lower level %d\n", node_id);
-        }
+        }else
+            printf("[Broker] *** ERROR, CONNACK msg not passed to lower level (error code: %d) ***\n", err_code);
     }
     
     /**

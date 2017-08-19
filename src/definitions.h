@@ -7,17 +7,29 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
+// 1 debug mode on, 0 debug mode off
+#define DEBUG               1
+
+//1 for static assignment of topics and qos levels subscription, 0 for random values
+#define STATIC_ASSIGNMENT   1
+
 #define MAX_NODES       8
 #define BROKER_ADDRESS  1
 #define TOPIC_COUNT     3
+#define QOS_LEVEL_COUNT 2
 
 #define CONN_RETRY      2000
 #define SUB_RETRY       2000
-#define SAMPLE_DELAY    2000
+#define SAMPLE_DELAY    30000
+#define RETR_DELAY      300
+#define PUBACK_DELAY    1500
 
 #define NODE_OFFSET     2
 
 #define TOPIC_NAME_LENGTH 4
+
+#define RETR_QUEUE_SIZE   250
+#define HANDLE_QUEUE_SIZE 10
 
 /** MESSAGE STRUCTURE AND TYPES **/
 typedef enum {
@@ -35,8 +47,8 @@ typedef nx_struct {
 
 typedef nx_struct {
 
-    nx_bool qos;
     nx_uint8_t topic_id;
+    nx_bool qos;
     nx_uint8_t data;
     
 } pub_payload_t;
@@ -51,6 +63,13 @@ typedef nx_struct {
 	} msg_payload;
 	
 } msg_t;
+ 
+typedef nx_struct {
+
+    nx_uint8_t dest_node_id;
+    msg_t msg;
+	
+} retr_msg_t;
 
 /** TOPICS **/
 typedef enum {

@@ -21,6 +21,7 @@ implementation {
     components new FakeSensorC();
     components SerialPrintfC;
     components SerialStartC;
+    components RandomC;
 
     //Boot interface
     App.Boot -> MainC.Boot;
@@ -43,6 +44,10 @@ implementation {
     
     //Fake Sensor read
     App.Read -> FakeSensorC;
+    
+    //Random
+    App.Random -> RandomC;
+	RandomC <- MainC.SoftwareInit;
 
 }
 

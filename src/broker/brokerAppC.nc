@@ -19,6 +19,8 @@ implementation {
     components ActiveMessageC;
     components new TimerMilliC();
     components new BitVectorC(MAX_NODES);
+    components new QueueC(msg_t, HANDLE_QUEUE_SIZE) as hqueue;
+    components new QueueC(retr_msg_t, RETR_QUEUE_SIZE) as rqueue;
     components SerialPrintfC;
     components SerialStartC;
 
@@ -42,5 +44,10 @@ implementation {
 
     //BitVector 
     App.connected_nodes -> BitVectorC;
+    
+    //Queues
+    App.HandleQueue -> hqueue;
+    App.RetrQueue -> rqueue;
+    
 }
 

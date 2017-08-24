@@ -19,3 +19,5 @@
 /src/client/build/telosb/main.exe
 /src/client/build/telosb/main.ihex
 /src/client/build/telosb/tos_image.xml
+
+\.DS_Store

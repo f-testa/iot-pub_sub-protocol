@@ -182,6 +182,12 @@ module brokerC {
         uint8_t i;
         msg_t* msg = (msg_t*)(call Packet.getPayload(&packet,sizeof(msg_t)));
         msg -> msg_type = SUBACK;
+        
+        //check if node is connected
+        if(!(call connected_nodes.get(node_id-NODE_OFFSET))){
+            printf("[Broker] *** ERROR: node %d trying to subscribe but not yet connected\n", node_id);
+            return;
+        }   
 
         //store preferences on topic and QoS levels
         printf("[Broker] Received SUB from node %d\n", node_id);

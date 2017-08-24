@@ -83,17 +83,15 @@ module clientC {
     */
     void setSubInfo(){
         uint8_t i;
-        
-        if(STATIC_ASSIGNMENT){
-            //do not overwrite static assignment of topics and QoS
-        } else {
-            //overwrite static assignments with dynamic and randon ones
-            for(i=0; i<TOPIC_COUNT; i++){
+
+        for(i=0; i<TOPIC_COUNT; i++){
+            //if STATIC_ASSIGNMENT is not active, overwrite it with a dynamic and random one
+            if(!STATIC_ASSIGNMENT){
                 sub_topic[i] = call Random.rand16() % 2;
                 sub_qos[i] = call Random.rand16() % QOS_LEVEL_COUNT;
-                if(sub_topic[i])
-                    printf("[Client %d] SUB to Topic:%s -> QoS:%d\n", TOS_NODE_ID, topic_name[i], sub_qos[i]);
             }
+            if(sub_topic[i])
+                printf("[Client %d] SUB to Topic:%s -> QoS:%d\n", TOS_NODE_ID, topic_name[i], sub_qos[i]);
         }
     }
 
